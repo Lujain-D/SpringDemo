@@ -1,5 +1,6 @@
 package com.example.demo.filters;
 
+import com.example.demo.model.CustomUserDetails;
 import com.example.demo.services.CustomUserDetailsService;
 import com.example.demo.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +45,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication()==null){
             System.out.println("user and context exist");
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            if(jwtUtil.validateToken(jwt, userDetails)){
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
+//            try{
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                System.out.println("got User Details " + userDetails.getAuthorities());
+                if(jwtUtil.validateToken(jwt, userDetails)){
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
 
-                );
-                System.out.println("token is valid");
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
+                    );
+                    System.out.println("token is valid");
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+//            }
+//            catch (Exception e){
+//                System.out.println("catching in filter");
+//            }
+
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }

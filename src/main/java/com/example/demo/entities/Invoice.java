@@ -1,6 +1,8 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @Entity
 @Table
 @Where(clause="deleted=0") //hibernate way of deletion
+//@OnDelete( )
 public class Invoice {
 
 
@@ -27,8 +30,9 @@ public class Invoice {
     )
     private Integer id;
 
-//    @CreatedBy
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
     private Long number;
 
@@ -39,22 +43,22 @@ public class Invoice {
     @Column(name="issued", columnDefinition="datetime DEFAULT CURRENT_TIMESTAMP")
     private Date issued;
 
-//    @CreatedDate
-//    private Instant created;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "invoice")
-//    @JsonBackReference
     private List<Item> items;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "invoice")
     private List<Track> tracks;
 
 
+    private String fileLocation;
+    private Long fileSize;
+    private Date fileLastUpdated;
+    private Date fileLastCreated;
+
     @CreationTimestamp
     @Column(name="created", columnDefinition="datetime DEFAULT CURRENT_TIMESTAMP")
     private Instant created;
 
-//    @LastModifiedDate
     @UpdateTimestamp
     @Column(name = "updated", columnDefinition ="datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Instant updated;
@@ -88,6 +92,38 @@ public class Invoice {
         this.total = total;
         this.issued = issued;
         this.items = items;
+    }
+
+    public String getFileLocation() {
+        return fileLocation;
+    }
+
+    public void setFileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public Date getFileLastUpdated() {
+        return fileLastUpdated;
+    }
+
+    public void setFileLastUpdated(Date fileLastUpdated) {
+        this.fileLastUpdated = fileLastUpdated;
+    }
+
+    public Date getFileLastCreated() {
+        return fileLastCreated;
+    }
+
+    public void setFileLastCreated(Date fileLastCreated) {
+        this.fileLastCreated = fileLastCreated;
     }
 
     public Integer getId() {
@@ -138,6 +174,7 @@ public class Invoice {
         this.items = items;
     }
 
+//    @JsonIgnore
     public List<Track> getTracks() {
         return tracks;
     }
@@ -168,6 +205,15 @@ public class Invoice {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    @JsonIgnore
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
